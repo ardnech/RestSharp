@@ -368,7 +368,27 @@ namespace RestSharp.Authenticators.OAuth
 
                     break;
                 }
+                case OAuthSignatureMethod.RsaSha1:
+                    {
 
+                        RSACryptoServiceProvider crypto = new RSACryptoServiceProvider();
+
+                        //Load in the private key
+                        //RSAParameters RSAKeyInfo = crypto.ExportParameters(false);
+                        consumerSecret = "<RSAKeyValue><Modulus>tekJ7lfEbXyK5dRqQPaHzlS4ppnYhAEJD2BqMoNyZjmUdVowss+S6hsMBuPmx2gtT1CGnMGzDK/h5yKVrZzxtbi+pD39OSZy0Qm8nte4hl91EFS+IAcH4B7uHm6rfjp4L3kDsYEL9NLWES/nmWgVRz1gtqTr39G0JBcVTJf+B6hjJN1caN0PZeVDJL+P5wANEXEjYpTC0cWKVf6qO7jtT4/4CKMS2NnAaFs5FlPblnTay7Ei2fLWth0YFe19RpeRWkWmZVs1MlzAvnaPUpC6SLQDk5cjHG2pjPk7gb/wbOp9Yvq4OwFVsFIBWONcwdhOkFwVQF97D3F3aSsI/k+PZw==</Modulus><Exponent>AQAB</Exponent><P>36WJOX5I9Paq5KCxPJSSmPwp77kh9kactzjYMlAFFzj3QLYozNpBRoPMkQt7RKGEhRx9G8fc2wIZKGT8LvPhwpirLL2kpwr1g7jGgk/7k7dchPKg+XZE+ES3OyCbETaBV8SpnSZhA+KJu0vVfbM8GTiGlzQo+HV7zR+FRrJfjts=</P><Q>0DnaJea9db2Jhp6fa07wu5Fjp9Qya87puI5Lsf9mwR7hA+JIOu5khN09aOR+dyZ81Hs0r20BSlA1cd0X6el0qk0NNZQEKXo0oLYuJOwcVwmI1IISfD3y2Aw70Vxv7hdDa4dDthxjAzCBMCppqCyhu/2VD80SUP+yjkSRITNLiWU=</Q><DP>GUQuWJx3yZUEgYfV/i4a0cXLRxX3TEd19Q0q/6Qirxj0dg8eVOZjcX/6YHiXmI1W12L8j2LpBKUcCoA+LV/IJZ/x1sAmFekbC6KYaqh2l52jijGPFh/ScunweXGZkzxBKJVDREnNtA6n2M0cdXMGWyMTsYlnB4reTbI98Fq+iPk=</DP><DQ>YxkFX0BfLqfTycO4L0PUghABk6ADlxdUWEcwczgP2R0vDcAljBZktG7uiPslzOL+ScmRG2QPVySxKs2EUgiPQ3WEMdmN2YeVgF7zuxK7shiRjEGTNpns9zFrToplorRjm8s2SHdeD+iHszqcKjODjYpz5J8+dloaymaLg3d8HZk=</DQ><InverseQ>Sa2XzQotf6XDn1oIf+1atFyMPWXJX6mmfSNwK9YRZX2uFjz1QKkZh/JeGFKIj/pF5G96HidgVVZkwY2vrPmMTJCYqD3LVWCJKzrLJ4l9FWOysu7TvF6Id0Ue6EzRyjsVuQdJC0asFwwDfoy2mN2hux6hznTPuUE+Z7RCiC9ChGY=</InverseQ><D>PAhYGqwkSu2a+RYMqruxPcp/1ZtX9NhSoRx0b48ppcrCz6egAqK2HUQnx+5WLuCWc2Jjyj+yUzGIH7suIkl1Cz+YyqMaek3R/mJ0OQeAAfhmrakJxZAMbU5Hzws+1T1+hEwvh9jKlVUvCCUDDYFn5EbBMAVlQkv2YyKrCMfwMZ4182u6sBWZ7HosBa+AKgZy7jOd5haE1hsNLK/OOZmGneml8hTRydsbtfp+GK4NaRh9Pye5SOV3VTTEGbHYjVPOMBieqtFooC/fne2FJkVgV7VAN0lz5LxAoKp5wdfk6x6MNydYdwPkecsH0e/XnOQIQFybBYNwSzRyfsq8D2HXYQ==</D></RSAKeyValue>";
+                        string key = "{0}&{1}".FormatWith(consumerSecret, tokenSecret);
+                        crypto.FromXmlString(key);
+                        //RSAKeyInfo.Modulus = encoding.GetBytes(key);
+                        //crypto.ImportParameters(RSAKeyInfo);
+                        
+                        
+                        //Start the hash
+                        var hash = (new SHA1Managed()).ComputeHash(encoding.GetBytes(signatureBase));
+
+                        signature = Convert.ToBase64String(crypto.SignHash(hash, CryptoConfig.MapNameToOID("SHA1")), Base64FormattingOptions.None);
+
+                        break;
+                    }
                 default:
                     throw new NotImplementedException("Only HMAC-SHA1 and HMAC-SHA256 are currently supported.");
             }
